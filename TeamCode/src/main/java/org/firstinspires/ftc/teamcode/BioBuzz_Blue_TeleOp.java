@@ -16,8 +16,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.mechanisms.Meccanum_drive;
 
-@TeleOp (name = "BioBuzz_Red", group = "BioBuzz_TeleOp")
-public class BioBuzz_Red extends OpMode {
+@TeleOp (name = "BioBuzz_Blue_TeleOp", group = "BioBuzz_TeleOp")
+public class BioBuzz_Blue_TeleOp extends OpMode {
 
     private Limelight3A limelight;
 
@@ -68,12 +68,16 @@ public class BioBuzz_Red extends OpMode {
         lw.setDirection(DcMotor.Direction.FORWARD);
         mi.setDirection(DcMotor.Direction.FORWARD);
 
+        //Encoder control means the motor will target a speed and will be less affected by battery power
+        ms.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
         //---Meccanum---
         drive.init(hardwareMap);
 
         //---LimeLight---
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(0);
+        limelight.pipelineSwitch(1);
         telemetry.setMsTransmissionInterval(11);
 
         //---PinPoint---
@@ -99,10 +103,10 @@ public class BioBuzz_Red extends OpMode {
     @Override
     public void loop() {
         //---GamePad 1---
-        //---Meccanum Drive Inputs---
+        //---Mechanum Drive Inputs---
         forward = gamepad1.left_stick_y;
-        strafe = gamepad1.left_stick_x;
-        rotate = gamepad1.right_stick_x;
+        strafe = -gamepad1.left_stick_x;
+        rotate = -gamepad1.right_stick_x;
 
         limelight.updateRobotOrientation(getHeading());
         LLResult llResult = limelight.getLatestResult();
@@ -117,13 +121,13 @@ public class BioBuzz_Red extends OpMode {
             telemetry.addData("Limelight", "No Targets");
         }
 
-        //------Get April tag info-----------
+        //---Get April tag info---
         assert llResult != null;
         double tx = llResult.getTx();
-        //------Auto Align---------
+        //---Auto Align---
         if (gamepad1.left_trigger > 0.3){
             if (tx != 0) {
-                error = goalX + tx;
+                error = goalX - tx;
 
                 if (Math.abs(error) < angleTolerance) {
                     rotate = 0;
@@ -155,8 +159,7 @@ public class BioBuzz_Red extends OpMode {
         //---GamePad 2---
         //---Main Shooter---
         if (gamepad2.left_trigger > 0.3){
-            ms.setPower(0.47);
-
+            ms.setPower(0.54); //5375 okay - 0.60 too powerful
         } else {
             ms.setPower(0);
         }
@@ -175,6 +178,7 @@ public class BioBuzz_Red extends OpMode {
         //---Main Intake---
         if (gamepad2.right_bumper){
             mi.setPower(1);
+            gamepad1.rumble(150);
         }else{
             mi.setPower(0);
         }
@@ -199,13 +203,15 @@ public class BioBuzz_Red extends OpMode {
         }
 
         //---LED---
-        led_chain.setPosition(0.280);
+        led_chain.setPosition(0.611); //PWM LED's take a servo position command to set color
 
         //---Telemetry---
         telemetry.addLine("---Telemetry---");
         telemetry.addData("Time elapsed", "%3.0f", time.seconds());
         telemetry.addData("Shooter Power", ms.getPower());
         telemetry.addData("Intake Power", mi.getPower());
+        telemetry.addData("Load Wheel Power", lw.getPower());
+        telemetry.addData("ms position", ms.getCurrentPosition());
     }
 
     public void configurePinpoint(){
@@ -213,11 +219,12 @@ public class BioBuzz_Red extends OpMode {
         imu.setOffsets(-22.0, -155.0, DistanceUnit.MM);
         //Pod Types
         imu.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        //pod directions
+        //Pod directions
         imu.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD,
                 GoBildaPinpointDriver.EncoderDirection.FORWARD);
         //IMU auto calibrate
         imu.resetPosAndIMU();
     }
+
 
 }

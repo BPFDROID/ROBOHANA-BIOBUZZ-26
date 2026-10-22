@@ -15,22 +15,12 @@ public class Meccanum_drive {
         rightFront = hwmap.get(DcMotor.class, "rightFront");
         rightBack = hwmap.get(DcMotor.class, "rightBack");
 
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
-
-        leftBack.setDirection(DcMotor.Direction.REVERSE);
-
-        rightFront.setDirection(DcMotor.Direction.FORWARD);
-
-        rightBack.setDirection(DcMotor.Direction.FORWARD);
-
-        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-
+        //Set motor Directions - 10/15/26
+        rightFront.setDirection(DcMotor.Direction.REVERSE);
+        rightBack.setDirection(DcMotor.Direction.REVERSE);
     }
 
+    //declare drive variables to be called in other classes - 10/15/26
     public void drive(double forward, double strafe, double rotate) {
         double frontleftpower = forward + strafe + rotate;
         double backleftpower = forward - strafe + rotate;
@@ -38,13 +28,15 @@ public class Meccanum_drive {
         double backrightpower = forward + strafe - rotate;
 
         double maxPower = 1.0; //Sets max motor power
-        double maxSpeed = 1.0; //Adjusts robot speed
+        double maxSpeed = 1.0; //Adjusts robot speed - set lower for outreach
 
+        //set maxPower to motors - 10/15/26
         maxPower = Math.max(maxPower, Math.abs(frontleftpower));
         maxPower = Math.max(maxPower, Math.abs(backleftpower));
         maxPower = Math.max(maxPower, Math.abs(frontrightpower));
         maxPower = Math.max(maxPower, Math.abs(backrightpower));
 
+        //Constrain with max speed - 10/15/26
         leftFront.setPower(maxSpeed * (frontleftpower / maxPower));
         leftBack.setPower(maxSpeed * (backleftpower / maxPower));
         rightFront.setPower(maxSpeed * (frontrightpower / maxPower));
