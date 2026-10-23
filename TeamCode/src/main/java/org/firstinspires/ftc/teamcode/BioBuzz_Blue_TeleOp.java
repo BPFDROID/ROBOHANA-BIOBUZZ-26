@@ -43,7 +43,7 @@ public class BioBuzz_Blue_TeleOp extends OpMode {
     double lastError =0;
     double goalX = 0;
     double angleTolerance = 0.4;
-    double kD = 0.0020;
+    double kD = 0.0030;
     double curTime = 0;
     double lastTime = 0;
 
@@ -147,6 +147,8 @@ public class BioBuzz_Blue_TeleOp extends OpMode {
                 lastError = 0;
                 lastTime = getRuntime();
             }
+            //rumble operator controller when tracking - 10/22/26
+            gamepad2.rumble(150);
         } else {
             lastError = 0;
             lastTime = getRuntime();
